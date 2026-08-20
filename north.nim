@@ -1,8 +1,26 @@
-import std/[rdstdin, strutils]
+import std/[rdstdin, strutils, tables, sugar]
 
-var stack = newSeqOfCap[string](256)
-var line: string
-var num: int
+func addition(a: int, b: int): int =
+    return a + b
+
+func subtraction(a: int, b: int): int =
+    return b - a
+
+func multiplication(a: int, b: int): int =
+    return a * b
+
+func division(a: int, b: int): int =
+    return b div a
+
+var
+    stack = newSeqOfCap[string](256)
+    line: string
+    env = {
+        "+": addition,
+        "-": subtraction,
+        "*": multiplication,
+        "/": division,
+    }.toTable
 
 while true:
   let ok = readLineFromStdin("north> ", line)
@@ -13,12 +31,12 @@ while true:
         stack.add(line)
         echo stack
     except ValueError:
-        if line == "+":
-            let a = stack.pop.parseInt
-            let b = stack.pop.parseInt
-            let c = a + b
-            stack.add($c)
-            echo stack
+        let a = stack.pop.parseInt
+        let b = stack.pop.parseInt
+        proc passAandB(f: (int, int) -> int): int = f(a, b)
+        let c = passAandB(env[line])
+        stack.add($c)
+        echo stack
 
 echo "bye"
 echo stack
