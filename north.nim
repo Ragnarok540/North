@@ -15,7 +15,7 @@ func division(a: int, b: int): int =
 var
     stack = newSeqOfCap[string](256)
     line: string
-    env = {
+    dictionary = {
         "+": addition,
         "-": subtraction,
         "*": multiplication,
@@ -23,21 +23,16 @@ var
     }.toTable
 
 while true:
-  let ok = readLineFromStdin("north> ", line)
-  if not ok: break
-  if line.len > 0:
-    let words = line.split(" ")
-    for word in words:
-        try:
-            discard word.parseInt
-            stack.add(word)
-            echo stack # debug
-        except ValueError:
+    let ok = readLineFromStdin("north> ", line)
+    if not ok: break
+    if line.len > 0:
+        let words = line.split(" ")
+        for word in words:
             if word in ["+", "-", "*", "/"]:
                 let a = stack.pop.parseInt
                 let b = stack.pop.parseInt
                 proc passAandB(f: (int, int) -> int): int = f(a, b)
-                let c = passAandB(env[word])
+                let c = passAandB(dictionary[word])
                 stack.add($c)
                 echo stack # debug
             elif word == ".":
@@ -45,10 +40,8 @@ while true:
                 echo a
                 echo stack # debug
             else:
-                echo "word not found: " & word
+                stack.add(word)
                 echo stack # debug
-
-    stdout.flushFile
 
 echo "bye"
 echo stack
