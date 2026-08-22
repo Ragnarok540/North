@@ -1,9 +1,12 @@
-import std/[strutils, rdstdin]
+import std/[strutils, rdstdin, tables]
 import north
 
 var
     stack = newSeqOfCap[string](256)
     line: string
+    dictionary = {
+        "add1": "1 +" 
+    }.toTable
 
 while true:
     let ok = readLineFromStdin("north> ", line)
@@ -11,7 +14,11 @@ while true:
     if line.len > 0:
         let words = line.split(" ")
         for word in words:
-            stack.eval(word)
+            if word == ":":
+                dictionary.defineWord(words)
+                echo dictionary # debug
+                break
+            stack.eval(word, dictionary)
             echo stack # debug
 
 echo "bye"
