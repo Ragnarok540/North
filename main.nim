@@ -5,7 +5,8 @@ var
     stack = newSeqOfCap[string](256)
     line: string
     dictionary = {
-        "add1": "1 +" 
+        "add1": "1 +",
+        "square": "dup *",
     }.toTable
 
 while true:

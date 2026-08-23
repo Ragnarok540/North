@@ -25,6 +25,12 @@ var operations = {
         "=": equal,
     }.toTable
 
+proc unquote(word: var string) =
+    assert word[0] == '['
+    assert word[^1] == ']'
+    word.removePrefix('[')
+    word.removeSuffix(']')
+
 proc eval*(stack: var seq[string], word: string, dictionary: Table[string, string]) =
     if word in ["+", "-", "*", "/", "="]:
         let a = stack.pop.parseInt
@@ -56,16 +62,27 @@ proc eval*(stack: var seq[string], word: string, dictionary: Table[string, strin
         stack.add(n2)
         stack.add(n3)
         stack.add(n1)
+    elif word == "apply":
+        var a = stack.pop
+        a.unquote
+        for aa in a.split(" "):
+            stack.eval(aa, dictionary)
+    elif word == "compose":
+        var a = stack.pop
+        a.unquote
+        var b = stack.pop
+        b.unquote
+        stack.add("[" & b & " " & a & "]")
     elif word == ".":
         let a = stack.pop
         echo a
-    # elif word == "emit":
-    #     let a = stack.pop.parseInt
-    #     stdout.write(a.byte)
+    elif word == "":
+        discard
     else:
         try:
             let definition = dictionary[word]
-            for w in definition.split(" "):
+            let words = definition.split(" ")
+            for w in words:
                 stack.eval(w, dictionary)
         except KeyError:
             stack.add(word)
