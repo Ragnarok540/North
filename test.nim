@@ -2,7 +2,8 @@ import std/[strutils, tables]
 import north
 
 var dictionary = {
-    "add1": "1 +"
+    "add1": "1 +",
+    "square": "dup *",
 }.toTable
 
 proc test_addition() =
@@ -54,16 +55,6 @@ proc test_rpn() =
         stack.eval(word, dictionary)
     assert stack == @["70"]
     echo "test_rpn good!"
-
-proc test_dot() =
-    var
-        stack = newSeqOfCap[string](2)
-        line = "1 ."
-        words = line.split(" ")
-    for word in words:
-        stack.eval(word, dictionary)
-    assert stack == @[]
-    echo "test_dot good!"
 
 proc test_define() =
     var
@@ -128,18 +119,78 @@ proc test_rot() =
     assert stack == @["2", "3", "1"]
     echo "test_rot good!"
 
+proc test_apply() =
+    var
+        stack = newSeqOfCap[string](8)
+        line = "1 2 3 [add1] apply"
+        words = line.split(" ")
+    for word in words:
+        stack.eval(word, dictionary)
+    assert stack == @["1", "2", "4"]
+    echo "test_apply good!"
+
+proc test_compose() =
+    var
+        stack = newSeqOfCap[string](8)
+        line = "1 2 3 [add1] [square] compose"
+        words = line.split(" ")
+    for word in words:
+        stack.eval(word, dictionary)
+    assert stack == @["1", "2", "3", "[add1 square]"]
+    echo "test_compose good!"
+
+proc test_ifte_1() =
+    var
+        stack = newSeqOfCap[string](8)
+        line = "1 2 3 [condition] [consequent] [alternative] ifte"
+        words = line.split(" ")
+    dictionary.defineWord(": condition 3 = ;".split(" "))
+    dictionary.defineWord(": consequent 123 ;".split(" "))
+    dictionary.defineWord(": alternative 456 ;".split(" "))
+    for word in words:
+        stack.eval(word, dictionary)
+    assert stack == @["1", "2", "123"]
+    echo "test_ifte_1 good!"
+
+proc test_ifte_2() =
+    var
+        stack = newSeqOfCap[string](8)
+        line = "1 2 3 [condition] [consequent] [alternative] ifte"
+        words = line.split(" ")
+    dictionary.defineWord(": condition 2 = ;".split(" "))
+    dictionary.defineWord(": consequent 123 ;".split(" "))
+    dictionary.defineWord(": alternative 456 ;".split(" "))
+    for word in words:
+        stack.eval(word, dictionary)
+    assert stack == @["1", "2", "456"]
+    echo "test_ifte_2 good!"
+
+proc test_dot() =
+    var
+        stack = newSeqOfCap[string](2)
+        line = "1 ."
+        words = line.split(" ")
+    for word in words:
+        stack.eval(word, dictionary)
+    assert stack == @[]
+    echo "test_dot good!"
+
 test_addition()
 test_subtraction()
 test_multiplication()
 test_division()
 test_rpn()
-test_dot()
 test_define()
 test_dup()
 test_drop()
 test_swap()
 test_over()
 test_rot()
+test_apply()
+test_compose()
+test_ifte_1()
+test_ifte_2()
+test_dot()
 
 # mkdir -p bin
 # nim c -o:bin/test test.nim 

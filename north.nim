@@ -73,6 +73,22 @@ proc eval*(stack: var seq[string], word: string, dictionary: Table[string, strin
         var b = stack.pop
         b.unquote
         stack.add("[" & b & " " & a & "]")
+    elif word == "ifte":
+        var alternative = stack.pop
+        var consequent = stack.pop
+        var condition = stack.pop
+        condition.unquote
+        for cond in condition.split(" "):
+            stack.eval(cond, dictionary)
+        var res = stack.pop.parseInt
+        if res != 0:
+            consequent.unquote
+            for cons in consequent.split(" "):
+                stack.eval(cons, dictionary)
+        else:
+            alternative.unquote
+            for alt in alternative.split(" "):
+                stack.eval(alt, dictionary)
     elif word == ".":
         let a = stack.pop
         echo a
