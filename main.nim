@@ -7,6 +7,7 @@ var
     dictionary = {
         "add1": "1 +",
         "square": "dup *",
+        "append": "unit compose",
     }.toTable
 
 while true:

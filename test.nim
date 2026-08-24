@@ -6,7 +6,7 @@ var dictionary = {
     "square": "dup *",
 }.toTable
 
-proc test_addition() =
+proc testAddition() =
     var
         stack = newSeqOfCap[string](4)
         line = "2 3 +"
@@ -14,9 +14,9 @@ proc test_addition() =
     for word in words:
         stack.eval(word, dictionary)
     assert stack == @["5"]
-    echo "test_addition good!"
+    echo "testAddition good!"
 
-proc test_subtraction() =
+proc testSubtraction() =
     var
         stack = newSeqOfCap[string](4)
         line = "2 3 -"
@@ -24,9 +24,9 @@ proc test_subtraction() =
     for word in words:
         stack.eval(word, dictionary)
     assert stack == @["-1"]
-    echo "test_subtraction good!"
+    echo "testSubtraction good!"
 
-proc test_multiplication() =
+proc testMultiplication() =
     var
         stack = newSeqOfCap[string](4)
         line = "2 3 *"
@@ -34,9 +34,9 @@ proc test_multiplication() =
     for word in words:
         stack.eval(word, dictionary)
     assert stack == @["6"]
-    echo "test_multiplication good!"
+    echo "testMultiplication good!"
 
-proc test_division() =
+proc testDivision() =
     var
         stack = newSeqOfCap[string](4)
         line = "4 2 /"
@@ -44,9 +44,9 @@ proc test_division() =
     for word in words:
         stack.eval(word, dictionary)
     assert stack == @["2"]
-    echo "test_division good!"
+    echo "testDivision good!"
 
-proc test_rpn() =
+proc testRpn() =
     var
         stack = newSeqOfCap[string](8)
         line = "5 2 + 10 *"
@@ -54,9 +54,59 @@ proc test_rpn() =
     for word in words:
         stack.eval(word, dictionary)
     assert stack == @["70"]
-    echo "test_rpn good!"
+    echo "testRpn good!"
 
-proc test_define() =
+proc testModulo() =
+    var
+        stack = newSeqOfCap[string](4)
+        line = "3 2 mod"
+        words = line.split(" ")
+    for word in words:
+        stack.eval(word, dictionary)
+    assert stack == @["1"]
+    echo "testModulo good!"
+
+proc testConjuction() =
+    var
+        stack = newSeqOfCap[string](4)
+        line = "0 0 and"
+        words = line.split(" ")
+    for word in words:
+        stack.eval(word, dictionary)
+    assert stack == @["0"]
+    echo "testConjuction good!"
+
+proc testDisjunction() =
+    var
+        stack = newSeqOfCap[string](4)
+        line = "0 -1 or"
+        words = line.split(" ")
+    for word in words:
+        stack.eval(word, dictionary)
+    assert stack == @["-1"]
+    echo "testDisjunction good!"
+
+proc testEqual() =
+    var
+        stack = newSeqOfCap[string](4)
+        line = "1 1 ="
+        words = line.split(" ")
+    for word in words:
+        stack.eval(word, dictionary)
+    assert stack == @["-1"]
+    echo "testEqual good!"
+
+proc testInvert() =
+    var
+        stack = newSeqOfCap[string](4)
+        line = "0 invert"
+        words = line.split(" ")
+    for word in words:
+        stack.eval(word, dictionary)
+    assert stack == @["-1"]
+    echo "testInvert good!"
+
+proc testDefine() =
     var
         stack = newSeqOfCap[string](2)
         line = ": foo 100 + ;"
@@ -67,9 +117,9 @@ proc test_define() =
     for word in words:
         stack.eval(word, dictionary)
     assert stack == @["101"]
-    echo "test_define good!"
+    echo "testDefine good!"
 
-proc test_dup() =
+proc testDup() =
     var
         stack = newSeqOfCap[string](8)
         line = "1 2 3 dup"
@@ -77,9 +127,9 @@ proc test_dup() =
     for word in words:
         stack.eval(word, dictionary)
     assert stack == @["1", "2", "3", "3"]
-    echo "test_dup good!"
+    echo "testDup good!"
 
-proc test_drop() =
+proc testDrop() =
     var
         stack = newSeqOfCap[string](8)
         line = "1 2 3 drop"
@@ -87,9 +137,9 @@ proc test_drop() =
     for word in words:
         stack.eval(word, dictionary)
     assert stack == @["1", "2"]
-    echo "test_drop good!"
+    echo "testDrop good!"
 
-proc test_swap() =
+proc testSwap() =
     var
         stack = newSeqOfCap[string](8)
         line = "1 2 3 4 swap"
@@ -97,9 +147,9 @@ proc test_swap() =
     for word in words:
         stack.eval(word, dictionary)
     assert stack == @["1", "2", "4", "3"]
-    echo "test_swap good!"
+    echo "testSwap good!"
 
-proc test_over() =
+proc testOver() =
     var
         stack = newSeqOfCap[string](8)
         line = "1 2 3 over"
@@ -107,9 +157,9 @@ proc test_over() =
     for word in words:
         stack.eval(word, dictionary)
     assert stack == @["1", "2", "3", "2"]
-    echo "test_over good!"
+    echo "testOver good!"
 
-proc test_rot() =
+proc testRot() =
     var
         stack = newSeqOfCap[string](8)
         line = "1 2 3 rot"
@@ -117,9 +167,9 @@ proc test_rot() =
     for word in words:
         stack.eval(word, dictionary)
     assert stack == @["2", "3", "1"]
-    echo "test_rot good!"
+    echo "testRot good!"
 
-proc test_apply() =
+proc testApply() =
     var
         stack = newSeqOfCap[string](8)
         line = "1 2 3 [add1] apply"
@@ -127,9 +177,9 @@ proc test_apply() =
     for word in words:
         stack.eval(word, dictionary)
     assert stack == @["1", "2", "4"]
-    echo "test_apply good!"
+    echo "testApply good!"
 
-proc test_compose() =
+proc testCompose() =
     var
         stack = newSeqOfCap[string](8)
         line = "1 2 3 [add1] [square] compose"
@@ -137,9 +187,9 @@ proc test_compose() =
     for word in words:
         stack.eval(word, dictionary)
     assert stack == @["1", "2", "3", "[add1 square]"]
-    echo "test_compose good!"
+    echo "testCompose good!"
 
-proc test_ifte_1() =
+proc testIfte1() =
     var
         stack = newSeqOfCap[string](8)
         line = "1 2 3 [condition] [consequent] [alternative] ifte"
@@ -150,9 +200,9 @@ proc test_ifte_1() =
     for word in words:
         stack.eval(word, dictionary)
     assert stack == @["1", "2", "123"]
-    echo "test_ifte_1 good!"
+    echo "testIfte1 good!"
 
-proc test_ifte_2() =
+proc testIfte2() =
     var
         stack = newSeqOfCap[string](8)
         line = "1 2 3 [condition] [consequent] [alternative] ifte"
@@ -163,9 +213,9 @@ proc test_ifte_2() =
     for word in words:
         stack.eval(word, dictionary)
     assert stack == @["1", "2", "456"]
-    echo "test_ifte_2 good!"
+    echo "testIfte2 good!"
 
-proc test_ifte_3() =
+proc testIfte3() =
     var
         stack = newSeqOfCap[string](8)
         line = "1 2 3 [condition] [consequent] [alternative] ifte"
@@ -176,9 +226,9 @@ proc test_ifte_3() =
     for word in words:
         stack.eval(word, dictionary)
     assert stack == @["1", "2", "0", "456"]
-    echo "test_ifte_3 good!"
+    echo "testIfte3 good!"
 
-proc test_loop() =
+proc testLoop() =
     var
         stack = newSeqOfCap[string](8)
         line = "10 [print-index] loop"
@@ -187,9 +237,9 @@ proc test_loop() =
     for word in words:
         stack.eval(word, dictionary)
     assert stack == @[]
-    echo "test_loop good!"
+    echo "testLoop good!"
 
-proc test_dot() =
+proc testDot() =
     var
         stack = newSeqOfCap[string](2)
         line = "1 ."
@@ -197,26 +247,31 @@ proc test_dot() =
     for word in words:
         stack.eval(word, dictionary)
     assert stack == @[]
-    echo "test_dot good!"
+    echo "testDot good!"
 
-test_addition()
-test_subtraction()
-test_multiplication()
-test_division()
-test_rpn()
-test_define()
-test_dup()
-test_drop()
-test_swap()
-test_over()
-test_rot()
-test_apply()
-test_compose()
-test_ifte_1()
-test_ifte_2()
-test_ifte_3()
-test_loop()
-test_dot()
+testAddition()
+testSubtraction()
+testMultiplication()
+testDivision()
+testRpn()
+testModulo()
+testConjuction()
+testDisjunction()
+testEqual()
+testInvert()
+testDefine()
+testDup()
+testDrop()
+testSwap()
+testOver()
+testRot()
+testApply()
+testCompose()
+testIfte1()
+testIfte2()
+testIfte3()
+testLoop()
+testDot()
 
 # mkdir -p bin
 # nim c -o:bin/test test.nim 

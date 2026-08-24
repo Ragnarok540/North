@@ -18,7 +18,7 @@ func modulo(a: int, b: int): int =
 func conjuction(a: int, b: int): int =
     return b and a
 
-func inclusiveOr(a: int, b: int): int =
+func disjunction(a: int, b: int): int =
     return b or a
 
 func equal(a: int, b: int): int =
@@ -38,7 +38,7 @@ var binaryOperations = {
         "/": division,
         "mod": modulo,
         "and": conjuction,
-        "or": inclusiveOr,
+        "or": disjunction,
         "=": equal,
     }.toTable
 
@@ -49,8 +49,8 @@ var unaryOperations = {
 proc unquote(word: var string) =
     assert word[0] == '['
     assert word[^1] == ']'
-    word.removePrefix('[')
-    word.removeSuffix(']')
+    word.removePrefix("[")
+    word.removeSuffix("]")
 
 proc eval*(stack: var seq[string], word: string, dictionary: var Table[string, string]) =
     if word in ["+", "-", "*", "/", "mod", "or", "and", "="]:
@@ -91,14 +91,27 @@ proc eval*(stack: var seq[string], word: string, dictionary: var Table[string, s
     elif word == "apply":
         var program = stack.pop
         program.unquote
-        for p in program.split(" "):
-            stack.eval(p, dictionary)
+        if program[0] == '[' and program[^1] == ']':
+            stack.add(program)
+        else:
+            for p in program.split(" "):
+                stack.eval(p, dictionary)
     elif word == "compose":
         var a = stack.pop
         a.unquote
         var b = stack.pop
         b.unquote
-        stack.add(fmt"[{b} {a}]")
+        if b == "" and a == "":
+            stack.add("[]")
+        elif b == "":
+            stack.add(fmt"[{a}]")
+        elif a == "":
+            stack.add(fmt"[{b}]")
+        else:
+            stack.add(fmt"[{b} {a}]")
+    elif word == "unit":
+        var a = stack.pop
+        stack.add(fmt"[{a}]")
     elif word == "ifte":
         var alternative = stack.pop
         var consequent = stack.pop

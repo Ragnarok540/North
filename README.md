@@ -1,7 +1,7 @@
 # North
 Like Forth, but in Nim
 
-```Forth
+```Factor
 : div-3 3 mod 0 = dup ;
 : print-fizz Fizz . ;
 : fizz? [div-3] [print-fizz] [] ifte ;
@@ -20,3 +20,4 @@ do-fizz-buzz
 ```
 
 - https://skilldrick.github.io/easyforth/
+- https://wiki.c2.com/?ForthLanguage
