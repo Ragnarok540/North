@@ -1,4 +1,4 @@
-import std/[strutils, sugar, tables]
+import std/[strutils, strformat, sugar, tables]
 
 func addition(a: int, b: int): int =
     return a + b
@@ -12,17 +12,38 @@ func multiplication(a: int, b: int): int =
 func division(a: int, b: int): int =
     return b div a
 
+func modulo(a: int, b: int): int =
+    return b mod a
+
+func conjuction(a: int, b: int): int =
+    return b and a
+
+func inclusiveOr(a: int, b: int): int =
+    return b or a
+
 func equal(a: int, b: int): int =
     if a == b:
         return -1
     return 0
 
-var operations = {
+func invert(a: int): int =
+    if a == 0:
+        return -1
+    return 0
+
+var binaryOperations = {
         "+": addition,
         "-": subtraction,
         "*": multiplication,
         "/": division,
+        "mod": modulo,
+        "and": conjuction,
+        "or": inclusiveOr,
         "=": equal,
+    }.toTable
+
+var unaryOperations = {
+        "invert": invert,
     }.toTable
 
 proc unquote(word: var string) =
@@ -31,13 +52,18 @@ proc unquote(word: var string) =
     word.removePrefix('[')
     word.removeSuffix(']')
 
-proc eval*(stack: var seq[string], word: string, dictionary: Table[string, string]) =
-    if word in ["+", "-", "*", "/", "="]:
+proc eval*(stack: var seq[string], word: string, dictionary: var Table[string, string]) =
+    if word in ["+", "-", "*", "/", "mod", "or", "and", "="]:
         let a = stack.pop.parseInt
         let b = stack.pop.parseInt
         proc passAandB(f: (int, int) -> int): int = f(a, b)
-        let c = passAandB(operations[word])
+        let c = passAandB(binaryOperations[word])
         stack.add($c)
+    elif word in ["invert"]:
+        let a = stack.pop.parseInt
+        proc passA(f: (int) -> int): int = f(a)
+        let b = passA(unaryOperations[word])
+        stack.add($b)
     elif word == "dup":
         let n = stack.pop
         stack.add(n)
@@ -63,16 +89,16 @@ proc eval*(stack: var seq[string], word: string, dictionary: Table[string, strin
         stack.add(n3)
         stack.add(n1)
     elif word == "apply":
-        var a = stack.pop
-        a.unquote
-        for aa in a.split(" "):
-            stack.eval(aa, dictionary)
+        var program = stack.pop
+        program.unquote
+        for p in program.split(" "):
+            stack.eval(p, dictionary)
     elif word == "compose":
         var a = stack.pop
         a.unquote
         var b = stack.pop
         b.unquote
-        stack.add("[" & b & " " & a & "]")
+        stack.add(fmt"[{b} {a}]")
     elif word == "ifte":
         var alternative = stack.pop
         var consequent = stack.pop
@@ -89,16 +115,22 @@ proc eval*(stack: var seq[string], word: string, dictionary: Table[string, strin
             alternative.unquote
             for alt in alternative.split(" "):
                 stack.eval(alt, dictionary)
+    elif word == "loop":
+        var program = stack.pop
+        var times = stack.pop.parseInt
+        program.unquote
+        for i in 1..times:
+            dictionary["index"] = $i
+            for p in program.split(" "):
+                stack.eval(p, dictionary)
     elif word == ".":
-        let a = stack.pop
-        echo a
+        echo stack.pop
     elif word == "":
         discard
     else:
         try:
             let definition = dictionary[word]
-            let words = definition.split(" ")
-            for w in words:
+            for w in definition.split(" "):
                 stack.eval(w, dictionary)
         except KeyError:
             stack.add(word)

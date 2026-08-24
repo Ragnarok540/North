@@ -165,6 +165,30 @@ proc test_ifte_2() =
     assert stack == @["1", "2", "456"]
     echo "test_ifte_2 good!"
 
+proc test_ifte_3() =
+    var
+        stack = newSeqOfCap[string](8)
+        line = "1 2 3 [condition] [consequent] [alternative] ifte"
+        words = line.split(" ")
+    dictionary.defineWord(": condition 2 = dup ;".split(" "))
+    dictionary.defineWord(": consequent 123 ;".split(" "))
+    dictionary.defineWord(": alternative 456 ;".split(" "))
+    for word in words:
+        stack.eval(word, dictionary)
+    assert stack == @["1", "2", "0", "456"]
+    echo "test_ifte_3 good!"
+
+proc test_loop() =
+    var
+        stack = newSeqOfCap[string](8)
+        line = "10 [print-index] loop"
+        words = line.split(" ")
+    dictionary.defineWord(": print-index index . ;".split(" "))
+    for word in words:
+        stack.eval(word, dictionary)
+    assert stack == @[]
+    echo "test_loop good!"
+
 proc test_dot() =
     var
         stack = newSeqOfCap[string](2)
@@ -190,6 +214,8 @@ test_apply()
 test_compose()
 test_ifte_1()
 test_ifte_2()
+test_ifte_3()
+test_loop()
 test_dot()
 
 # mkdir -p bin
