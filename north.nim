@@ -112,7 +112,7 @@ proc eval*(stack: var seq[string], word: string, dictionary: var Table[string, s
     elif word == "unit":
         var a = stack.pop
         stack.add(fmt"[{a}]")
-    elif word == "ifte":
+    elif word == "if":
         var alternative = stack.pop
         var consequent = stack.pop
         var condition = stack.pop
@@ -130,10 +130,12 @@ proc eval*(stack: var seq[string], word: string, dictionary: var Table[string, s
                 stack.eval(alt, dictionary)
     elif word == "loop":
         var program = stack.pop
+        var index = stack.pop
         var times = stack.pop.parseInt
         program.unquote
+        index.unquote
         for i in 1..times:
-            dictionary["index"] = $i
+            dictionary[index] = $i
             for p in program.split(" "):
                 stack.eval(p, dictionary)
     elif word == ".":

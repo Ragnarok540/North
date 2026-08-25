@@ -189,10 +189,20 @@ proc testCompose() =
     assert stack == @["1", "2", "3", "[add1 square]"]
     echo "testCompose good!"
 
+proc testUnit() =
+    var
+        stack = newSeqOfCap[string](8)
+        line = "1 2 3 unit"
+        words = line.split(" ")
+    for word in words:
+        stack.eval(word, dictionary)
+    assert stack == @["1", "2", "[3]"]
+    echo "testUnit good!"
+
 proc testIfte1() =
     var
         stack = newSeqOfCap[string](8)
-        line = "1 2 3 [condition] [consequent] [alternative] ifte"
+        line = "1 2 3 [condition] [consequent] [alternative] if"
         words = line.split(" ")
     dictionary.defineWord(": condition 3 = ;".split(" "))
     dictionary.defineWord(": consequent 123 ;".split(" "))
@@ -205,7 +215,7 @@ proc testIfte1() =
 proc testIfte2() =
     var
         stack = newSeqOfCap[string](8)
-        line = "1 2 3 [condition] [consequent] [alternative] ifte"
+        line = "1 2 3 [condition] [consequent] [alternative] if"
         words = line.split(" ")
     dictionary.defineWord(": condition 2 = ;".split(" "))
     dictionary.defineWord(": consequent 123 ;".split(" "))
@@ -218,7 +228,7 @@ proc testIfte2() =
 proc testIfte3() =
     var
         stack = newSeqOfCap[string](8)
-        line = "1 2 3 [condition] [consequent] [alternative] ifte"
+        line = "1 2 3 [condition] [consequent] [alternative] if"
         words = line.split(" ")
     dictionary.defineWord(": condition 2 = dup ;".split(" "))
     dictionary.defineWord(": consequent 123 ;".split(" "))
@@ -231,9 +241,9 @@ proc testIfte3() =
 proc testLoop() =
     var
         stack = newSeqOfCap[string](8)
-        line = "10 [print-index] loop"
+        line = "10 [i] [print-index] loop"
         words = line.split(" ")
-    dictionary.defineWord(": print-index index . ;".split(" "))
+    dictionary.defineWord(": print-index i . ;".split(" "))
     for word in words:
         stack.eval(word, dictionary)
     assert stack == @[]
@@ -267,6 +277,7 @@ testOver()
 testRot()
 testApply()
 testCompose()
+testUnit()
 testIfte1()
 testIfte2()
 testIfte3()
