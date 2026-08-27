@@ -5,20 +5,29 @@ var
     stack = newSeqOfCap[string](256)
     line: string
     dictionary = {
+        "debug": "0",
         "add1": "1 +",
         "square": "dup *",
         "append": "unit compose",
     }.toTable
 
+func isWordDefinition(words: seq[string]): bool =
+    return words[0] == ":" and words[^1] == ";" and len(words) >= 3
+
 proc processLine(stack: var seq[string], line: string, dictionary: var Table[string, string]) =
     let words = line.split(" ")
     for word in words:
         if word == ":":
+            if not isWordDefinition(words):
+                echo "invalid word definition"
+                break
             dictionary.defineWord(words)
-            echo dictionary # debug
+            if dictionary["debug"] != "0":
+                echo dictionary
             break
         stack.eval(word, dictionary)
-        echo stack # debug
+        if dictionary["debug"] != "0":
+            echo stack
 
 if paramCount() >= 1:
     var strm = newFileStream(paramStr(1), fmRead)
@@ -32,10 +41,14 @@ while true:
     let ok = readLineFromStdin("north> ", line)
     if not ok: break
     if line.len > 0:
-        stack.processLine(line, dictionary)
+        try:
+            stack.processLine(line, dictionary)
+        except ValueError:
+            echo "operation not allowed"
 
 echo "bye"
-echo stack # debug
+if dictionary["debug"] != "0":
+    echo stack
 
 # mkdir -p bin
 # nim c -o:bin/main main.nim 

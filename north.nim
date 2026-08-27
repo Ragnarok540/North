@@ -140,6 +140,12 @@ proc eval*(stack: var seq[string], word: string, dictionary: var Table[string, s
                 stack.eval(p, dictionary)
     elif word == ".":
         echo stack.pop
+    elif word == "debug":
+        dictionary[word] = $invert(dictionary[word].parseInt)
+        if dictionary[word] == "0":
+            echo "debug mode OFF"
+        else:
+            echo "debug mode ON"
     elif word == "":
         discard
     else:

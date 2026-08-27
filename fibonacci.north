@@ -1,0 +1,6 @@
+0 dup . 1 dup .
+
+: fib-step dup rot + dup . ;
+: fibonacci 50 [i] [fib-step] loop ;
+
+fibonacci
